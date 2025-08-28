@@ -1,0 +1,98 @@
+
+/*Background and text color for entire webpage*/
+html {
+    background-color: #0B3130;
+    color: white;
+}
+
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+input {
+    background-color: lightgrey;
+}
+
+/*Styling for sign-in form*/
+div.signIn {
+    background-color: #0E121E;
+
+    width: 325px;
+    height: 190px;
+    margin-top: 100px;
+    padding: 10px;
+
+    align-items: center;
+    justify-self: center;
+
+    border: 3px solid #5F5B6D;
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/*Styling for account creation form*/
+div.signUp {
+    background-color: #0E121E;
+
+    width: 325px;
+    height: 238px;
+    margin-top: 100px;
+    padding: 10px;
+
+    align-items: center;
+    justify-self: center;
+
+    border: 3px solid #5F5B6D;
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+div.titleHeader {
+    background-color: #126665;
+    width: 8.5%;
+    border-radius: 5px;
+}
+
+div.titleHeader h1 {
+    font-family:'Courier New', Courier, monospace;
+}
+
+#username, #password {
+    margin-top: 2%;
+}
+
+#createPw, #createUsername, #createEmail {
+    margin-top: 3%;
+}
+
+.signIn a {
+    color: cyan;
+}
+
+/*Styling for form submission buttons*/
+#createAccButton, #loginButton {
+    width: 100px;
+    height: 25px;
+
+    margin-left: 35%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+    border-radius: 5px;
+    border-style: double;
+    border-color: cyan;
+
+    background-color: grey;
+    color: white;
+}
+
+input {
+    border-color: cyan;
+}
+
