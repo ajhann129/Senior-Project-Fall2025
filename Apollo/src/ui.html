@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!--Container for application title-->
+    <div class="titleHeader">
+        <h1>Apollo</h1>
+    </div>
+    
+    <!--Container for user interface-->
+    <div class="interface">
+        <h1>Welcome back, user!</h1>
+
+        <!--Container for friends list-->
+        <div id="friendContainer">
+            <div id="friendsList">
+                <h3>Friends list</h3>
+                <ul>
+                    <li>Friend1</li>
+                    <li>Friend2</li>
+                    <li>Friend3</li>
+                    <li>Friend4</li>
+                    <li>Friend5</li>
+                    <li>Friend6</li>
+                </ul>
+            </div>
+            <!--Button to call friend request form-->
+            <button id="friendReqButton">Send Friend Request</button>
+        </div>
+        
+        <!--Container for groups joined-->
+        <div id="groupContainer">
+            <div id="groups">
+                <h3>Groups</h3>
+                <ul>
+                    <li>Group1</li>
+                    <li>Group2</li>
+                    <li>Group3</li>
+                    <li>Group4</li>
+                    <li>Group5</li>
+                    <li>Group6</li>
+                </ul>
+            </div>
+            <!--Button to call create group form-->
+            <button id="createGroupButton">Create Group</button>
+        </div>
+        
+        <form method="POST" id="friendForm" hidden>
+            <label for="friendId">Enter your friend's id here:</label>
+            <input type="text" id="friendId"></form>
+            <input type="submit" id="friendIdButton" hidden> 
+        </form>
+
+        <form method="POST" id="groupForm" hidden>
+            <label for="groupName">Enter your group's name here:</label>
+            <input type="text" id="groupName"></form>
+            <input type="submit" id="groupNameButton" hidden> 
+        </form>
+    </div>
+
+    <script src="ui.js"></script>
+    <!--Link to javascript 
+</body>
+</html>
