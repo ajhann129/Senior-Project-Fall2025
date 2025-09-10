@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo App Signup</title>
+    <link rel="stylesheet" href="styles.css">
+    <!--Reference to external stylesheet-->
+</head>
+<body>
+    <!--Container for application title-->
+    <div class="titleHeader">
+        <h1>Apollo</h1>
+    </div>
+
+    <!--Container for account creation form-->
+    <div id="signUp">
+        <h3>Create an Account Here...</h3>
+        <form method="POST" id="createAccForm">
+            <label for="createEmail">Email:</label>
+            <input type="text" id="createEmail">
+            <label for="createUsername">Username:</label>
+            <input type="text" id="createUsername">
+            <label for="createPw">Password:</label>
+            <input type="password" id="createPw">
+            <label for="pwConf">Confirm password:</label>
+            <input type="password" id="pwConf">
+            <input type="submit" id="createAccButton" style="margin-top: 26px;">
+        </form>
+    </div>
+    
+    <script src="signup.js"></script>
+    <!--Link to javascript-->
+</body>
+</html>
