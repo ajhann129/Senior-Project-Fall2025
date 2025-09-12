@@ -29,12 +29,13 @@ app.post('/', (req, res) => {
         approve.then(result => {
             // If the password given matches the hash stored in the database, redirect to the ui page
             if (result == true) {
-                console.log('login approved!');
+                console.log(`${userVal} has signed in!`);
                 res.redirect('/ui.html');
             }
-            // If the password given does not match the hash, send an error message
+            // If the password given does not match the hash, send an error message to the server
             else {
-                console.log('login failed!');
+                console.log(`Access denied to ${userVal}!`);
+                res.json();
             }
         })
     }
