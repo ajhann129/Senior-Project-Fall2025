@@ -188,7 +188,7 @@ div.interface form label{
     background-color: #0E121E;
 
     width: 325px;
-    height: 190px;
+    height: 220px;
     margin-top: 100px;
     padding: 10px;
 
@@ -209,6 +209,13 @@ div.interface form label{
 
 #signIn a {
     color: cyan;
+}
+
+#signIn p {
+    color: red;
+    font-size: small;
+
+    overflow-wrap: normal;
 }
 
 /*Styling for account creation form*/
