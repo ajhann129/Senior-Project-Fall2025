@@ -9,7 +9,7 @@ createAccButton.addEventListener('click', (event) => {
     event.preventDefault();
 
     // Validation for email
-    const emailReq = /[a-z A-Z]+@[a-z A-Z]+\.[a-z A-Z]{2,}$/;
+    const emailReq = /^[a-z A-Z]+@[a-z A-Z]+\.[a-z A-Z]{2,}$/;
     const email = createEmail.value.toString();
 
     //If the email matches requirements, remove any warnings and turn border green
@@ -35,7 +35,7 @@ createAccButton.addEventListener('click', (event) => {
     }
 
     // Validation for username
-    const userReq = /[a-z A-Z 0-9]{5,}$/;
+    const userReq = /^[a-z A-Z 0-9]{5,}$/;
     const username = createUsername.value;
 
     //If the username matches requirements, remove any warnings and turn border green
@@ -54,14 +54,23 @@ createAccButton.addEventListener('click', (event) => {
 
             let warning = document.createElement('p');
             warning.id = 'userWarning';
-            warning.innerHTML = '*Please enter a valid username';
+
+            if (username.length < 5) {
+                warning.innerHTML = 'Username must be at least five characters';
+            }
+
+            else {
+                warning.innerHTML = '*Please enter a valid username';
+            }
+            
+            
             createUsername.after(warning);
         }
 
     }
 
     // Validation for password
-    const passReq = /[a-z A-Z 0-9]{8,}$/;
+    const passReq = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{5,}$/;
     const password = createPw.value;
 
     //If the password matches requirements, remove any warnings and turn border green
@@ -81,7 +90,31 @@ createAccButton.addEventListener('click', (event) => {
             pwConf.style.borderColor = 'red';
 
             let warning = document.createElement('p');
-            warning.innerHTML = '*Please enter a valid password';
+
+            if (password != pwConf.value) {
+                warning.innerHTML = '*Both password fields must match';
+            }
+
+            else if (password.length < 8) {
+                warning.innerHTML = '*Password must be at least 8 characters';
+            }
+
+            else {
+
+                if (!password.match(/^(?=.*\d)[a-zA-Z0-9]{7,}$/)) {
+                    warning.innerHTML = "*Password must contain at least one digit"
+                }
+
+                else if (!password.match(/^(?=.*[a-z])[a-zA-Z0-9]{7,}$/)) {
+                    warning.innerHTML = "*Password must contain at least one lowercase letter"
+                }
+
+                else if (!password.match(/^(?=.*[A-Z])[a-zA-Z0-9]{7,}$/)) {
+                    warning.innerHTML = "*Password must contain at least one uppercase letter"
+                }
+            
+            }
+
             warning.id = 'pwWarning';
             pwConf.after(warning);
         }
