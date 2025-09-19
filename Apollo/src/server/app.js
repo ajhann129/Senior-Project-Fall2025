@@ -17,6 +17,7 @@ app.use(express.json());
 // Allows server to read form data
 app.use(express.urlencoded({extended: false}));
 
+// Response to user login
 app.post('/', (req, res) => {
     try {
         const db = new DbConnector();
@@ -30,23 +31,61 @@ app.post('/', (req, res) => {
             // If the password given matches the hash stored in the database, redirect to the ui page
             if (result == true) {
                 console.log(`${userVal} has signed in!`);
+                res.status(200);
                 res.redirect('/ui.html');
             }
-            // If the password given does not match the hash, send an error message to the server
+            // If the password given does not match the hash, send an error message to both the user and server
             else {
                 console.log(`Access denied to ${userVal}!`);
-                res.json();
+                res.status(401);
+                res.send({success: false});
             }
-        })
+        });
     }
 
+    // If an error occurs, print it to the console
     catch(error) {
         console.log(error.message);
     }
 });
 
-/*app.get('/example',(req, res) => {
-    res.send('<h1>Hello there.</h1> <link rel=\"stylesheet\" href=\"styles.css\">');
-})*/ 
+// Response to account creation
+app.post('/signup.html', (req, res) => {
+    
+    try {
+
+        // Assign email, username, and password with the values sent by the form
+        const {email, username, password} = req.body;
+        const db = new DbConnector();
+
+        // Attempt to create an account with the given credentials
+        const success = db.createAcc(email, username, password);
+
+        success.then(result => {
+            
+            // If the account is successfully created, redirect to the ui page 
+            if (result == true) {
+                console.log('Account successfully created!');
+                res.status(200);
+                res.redirect('/ui.html');
+            }
+            
+            // If account creation fails, send an error message to both the user and server 
+            else {
+                console.log('Account creation failed!');
+                res.status(500);
+                res.send({success: false});
+            }
+
+        });
+    }
+
+    // If an error occurs, print it to the console
+    catch (error){
+        console.log(error.message);
+    }
+    
+
+});
 
 app.listen(process.env.PORT, () => console.log('Server connected...'));
