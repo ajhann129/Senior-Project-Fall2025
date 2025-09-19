@@ -36,12 +36,13 @@ loginButton.addEventListener('click', (event) => {
             password.style.borderColor = 'red';
 
             let warning = document.createElement('p');
-            warning.id = 'emailWarning';
+            warning.id = 'userPwWarning';
             warning.innerHTML = '*Username or password incorrect';
-            password.after(warning);  
+            password.after(warning);
         }
 
     }).catch(error => {
+        // If an error occurs, print it to the console
         console.log(error);
     });
 

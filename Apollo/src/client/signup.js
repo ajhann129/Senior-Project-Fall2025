@@ -4,9 +4,12 @@ const createUsername = document.getElementById('createUsername');
 const createPw = document.getElementById('createPw');
 const pwConf = document.getElementById('pwConf');
 
-// Event listener for sign-up form submission
-createAccButton.addEventListener('click', (event) => {
-    event.preventDefault();
+
+// Function to validate form input
+function validateForm() {
+
+    // Declaring boolean variables for result
+    let validateEmail, validateUsername, validatePassword;
 
     // Validation for email
     const emailReq = /^[a-z A-Z]+@[a-z A-Z]+\.[a-z A-Z]{2,}$/;
@@ -18,6 +21,8 @@ createAccButton.addEventListener('click', (event) => {
 
         emailWarning = document.getElementById('emailWarning');
         if (emailWarning) emailWarning.remove();
+
+        validateEmail = true;
     }
 
     else {
@@ -32,6 +37,8 @@ createAccButton.addEventListener('click', (event) => {
             createEmail.after(warning);    
         }
 
+        validateEmail = false;
+
     }
 
     // Validation for username
@@ -44,6 +51,8 @@ createAccButton.addEventListener('click', (event) => {
 
         userWarning = document.getElementById('userWarning');
         if (userWarning) userWarning.remove();
+
+        validateUsername = true;
     }
 
     // If the username fails validation, turn border red and display warning
@@ -68,6 +77,8 @@ createAccButton.addEventListener('click', (event) => {
         
         // Insert new error message
         createUsername.after(warning);
+
+        validateUsername = false;
     }
 
     // Validation for password
@@ -81,6 +92,8 @@ createAccButton.addEventListener('click', (event) => {
 
         pwWarning = document.getElementById('pwWarning');
         if (pwWarning) pwWarning.remove();
+
+        validatePassword = true;
     }
 
     // If the password fails validation, turn border red and display warning
@@ -126,6 +139,47 @@ createAccButton.addEventListener('click', (event) => {
 
         // Insert new error message
         pwConf.after(warning);
+
+        validatePassword = false;
     }
 
-})
+    return (validateEmail && validateUsername && validatePassword);
+}
+
+// Event listener for sign-up form submission
+createAccButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    // Call function to validate form data
+    const result = validateForm();
+
+    if (result) {
+
+        // If input passes validation, create an object called data containing email, username, and password values
+        const data = {email: createEmail.value.toString(), username: createUsername.value.toString(), password: createPw.value.toString()};
+
+        // Make a fetch request to the server with method POST and content-type of JSON
+        fetch('http://localhost:3000/signup.html', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            // Convert the object data to a string format
+            body: JSON.stringify(data)
+        }).then(response => {
+            // Takes the returned Promise and resolves it to an object
+            response.json();
+
+            if (response.redirected) {
+                // If the response object is redirected by the server, change the window's location to that of the URL
+                window.location.href = response.url;
+            }
+        
+        }).catch(error => {
+            // If an error occurs, print it to the console.
+            console.log(error);
+        });
+    }
+
+});
+
