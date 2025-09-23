@@ -216,6 +216,8 @@ div.interface form label{
     font-size: small;
 
     overflow-wrap: normal;
+
+    margin-bottom: 7px;
 }
 
 /*Styling for account creation form*/

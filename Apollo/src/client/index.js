@@ -6,44 +6,89 @@ const password = document.getElementById('password');
 loginButton.addEventListener('click', (event) => {
     event.preventDefault();
 
-    //Set username and password values to those contained within the input elements
+    // Set username and password values to those contained within the input elements
     const userVal = username.value;
     const pwVal = password.value;
 
-    // Create an object called data containing userVal and pwVal
-    const data = {userVal, pwVal};
+    // If the form is left blank, display an error message
+    if (!(userVal && pwVal)) {
 
-    // Make a fetch request to the server with method POST and content-type of JSON
-    fetch('http://localhost:3000/', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        // Convert the object data to a string format
-        body: JSON.stringify(data)
-    }).then(response => {
-        // Takes the returned Promise and resolves it to an object
-        response.json();
-        
-        if (response.redirected) {
-            // If the response object is redirected by the server, change the window's location to that of the URL
-            window.location.href = response.url;
-        }
+        // If any previous errors were displayed, delete them
+        emptyWarning = document.getElementById('emptyWarning');
+        userPwWarning = document.getElementById('userPwWarning');
 
-        else if (username.style.borderColor != 'red' && password.style.borderColor != 'red') {
-            // Otherwise, if there was no redirect, display a warning to the user
-            username.style.borderColor = 'red';
-            password.style.borderColor = 'red';
+        if (emptyWarning) emptyWarning.remove();
 
-            let warning = document.createElement('p');
-            warning.id = 'userPwWarning';
-            warning.innerHTML = '*Username or password incorrect';
-            password.after(warning);
-        }
+        if (userPwWarning) userPwWarning.remove();
 
-    }).catch(error => {
-        // If an error occurs, print it to the console
-        console.log(error);
-    });
+        // Display new error and turn input borders red
+        username.style.borderColor = 'red';
+        password.style.borderColor = 'red';
+
+        let warning = document.createElement('p');
+        warning.id = 'emptyWarning';
+        warning.innerHTML = '*Please type a username and password';
+        password.after(warning);
+    }
+
+    else {
+
+        // If an error was previously displayed, clear it and turn input borders green
+        username.style.borderColor = 'green';
+        password.style.borderColor = 'green';
+
+        emptyWarning = document.getElementById('emptyWarning');
+        userPwWarning = document.getElementById('userPwWarning');
+
+        if (emptyWarning) emptyWarning.remove();
+
+        if (userPwWarning) userPwWarning.remove();
+
+        // Create an object called data containing userVal and pwVal
+        const data = {userVal, pwVal};
+
+        // Make a fetch request to the server with method POST and content-type of JSON
+        fetch('http://localhost:3000/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            // Convert the object data to a string format
+            body: JSON.stringify(data)
+        }).then(response => {
+            // Takes the returned Promise and resolves it to an object
+            response.json();
+            
+            if (response.redirected) {
+                // If the response object is redirected by the server, change the window's location to that of the URL
+                window.location.href = response.url;
+            }
+
+            else {
+                
+                // Otherwise, if there was no redirect, remove any previous errors and display a new error message
+                emptyWarning = document.getElementById('emptyWarning');
+                userPwWarning = document.getElementById('userPwWarning');
+
+                if (emptyWarning) emptyWarning.remove();
+
+                if (userPwWarning) userPwWarning.remove();
+
+                username.style.borderColor = 'red';
+                password.style.borderColor = 'red';
+
+                let warning = document.createElement('p');
+                warning.id = 'userPwWarning';
+                warning.innerHTML = '*Username or password incorrect';
+                password.after(warning);
+            }
+
+        }).catch(error => {
+            // If an error occurs, print it to the console
+            console.log(error);
+        });
+    }
+
+    
 
 })
