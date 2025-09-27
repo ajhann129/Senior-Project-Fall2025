@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo Chat with user</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="titleHeader">
+        <h1><a href="index.html">Apollo</a></h1>
+    </div>
+
+    <div class="interface">
+        <h1>Chat between user and user</h1>
+        <form method="POST">
+            <textarea maxlength="500" id="usrMsg"></textarea>
+            <button type="submit" id="sendMsg">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const usrMsg = document.getElementById('usrMsg');
+        const sendMsg = document.getElementById('sendMsg');
+
+        //Event listener for send button
+        sendMsg.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            message = document.createElement('p');
+            message.setAttribute('class', 'displayedMsg');
+            message.innerHTML = usrMsg.value;
+            usrMsg.before(message);
+
+            usrMsg.value = '';
+        });
+
+        //Event listener to send message with the Enter key
+        usrMsg.addEventListener('keydown', (event) => {
+            
+            if (event.key == 'Enter') {
+                message = document.createElement('p');
+                message.setAttribute('class', 'displayedMsg');
+                message.innerHTML = usrMsg.value;
+                usrMsg.before(message);
+
+                usrMsg.value = '';
+            }
+            
+        });
+    </script>
+</body>
+</html>
