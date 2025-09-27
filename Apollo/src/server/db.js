@@ -119,6 +119,103 @@ class DbConnector {
         }
 
     }
+
+    async getFriends(userVal) {
+
+        try {
+            
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            // Attempt to retrieve friend data for a user id
+            const friendList = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id, Username FROM user_data, friends WHERE F_id = ? AND User_id = U_id AND User_id != ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userId, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            return friendList;
+        }
+        
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+    async getGroups(userVal) {
+        try {
+            
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            // Attempt to retrieve group data for a user id
+            const groupList = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT Group_id, Group_name FROM user_data, group_data WHERE User_id = ? AND User_id = Creator_id';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            return groupList;
+        }
+        
+        catch(error) {
+            console.log(error);
+        }
+    }
 }
 
 // Exports the class DbConnector to be used in app.js
