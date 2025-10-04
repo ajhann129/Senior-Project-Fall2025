@@ -120,6 +120,165 @@ class DbConnector {
 
     }
 
+    async createGroup(userVal, groupName) {
+
+        try {
+
+            // Attempt to retrieve a user id for the given name
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Generate a random id number for the provided group name
+            const groupId = Math.floor(Math.random() * 1000000);
+
+            // Assign the retrieved user id to a constant
+            const userId = id[0].User_id.toString();
+
+            // Attempt to insert a new group into database
+            const gResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'INSERT INTO group_data VALUES (?, ?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [groupId, groupName, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Attempt to add creator as a member of group
+            const hResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO enters VALUES (?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [groupId, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // If group is successfully created, return true
+            return true;
+
+        }
+
+        
+        catch(error) {
+            
+            // If an error occurred in group creation, print it to console and return false
+            console.log(error);
+            return false;
+        }
+
+    }
+
+    async addMembers(groupName, members) {
+
+        try {
+            // Create a new array to store corresponding ids
+            const memberId = [members.length];
+
+            // Loop through database to retrieve associated id with each username
+            for (let i = 0; i < members.length; i++) {
+                let mId = await new Promise((resolve, reject) => {
+
+                    // Creates query for database connection
+                    let query = 'SELECT User_id FROM user_data WHERE username = ?';
+
+                    // Processes query through database, entering data from the current array index
+                    dbCon.query(query, [members[i]], (error, result) => {
+                        if (error) {
+                            reject(new Error(error.message));
+                        }
+                        else {
+                            resolve(result);
+                        }
+                    });
+                });
+
+                // Assign data retrieved to index i of the memberId array
+                memberId[i] = mId[0].User_id.toString();
+            }
+
+            // Attempt to retrieve a corresponding id for the provided groupName
+            const groupId = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT Group_id FROM group_data WHERE Group_name = ?';
+
+                // Processes query through database, replacing the ? with the groupName provided
+                dbCon.query(query, [groupName], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the retrieved group id to a constant
+            const gId = groupId[0].Group_id.toString();
+            
+            // Loop through the database a second time to assign members to the group
+            for (let i = 0; i < memberId.length; i++) {
+
+                let response = await new Promise((resolve, reject) => {
+                    
+                    // Creates query for database connection
+                    let query = 'INSERT INTO enters VALUES (?, ?)';
+
+                    // Processes query through database, replacing the ? with the values provided
+                    dbCon.query(query, [gId, memberId[i]], (error, result) => {
+                        if (error) { 
+                            reject(new Error(error.message));
+                        }
+                        else {
+                            resolve(result);
+                        } 
+                    });
+                });
+
+            }
+
+            // If members are successfully added, return true.
+            return true;
+
+        }
+
+        catch(error) {
+
+            // If an error occurred in adding members, print it to console and return false
+            console.log(error);
+            return false;
+        }
+
+    }
+ 
     async getFriends(userVal) {
 
         try {

@@ -5,10 +5,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const DbConnector = require('./db');
 
-//Loads contents of env file into process.env
+// Loads contents of env file into process.env
 dotenv.config();
 
-//Specifies cors as request handler
+// Specifies cors as request handler
 app.use(cors());
 // Allows server to display static HTML
 app.use(express.static('../client/static'));
@@ -20,6 +20,7 @@ app.use(express.urlencoded({extended: false}));
 app.set('views', '../client/views');
 app.set('view engine', 'ejs');
 
+// Array to store user information
 users = [];
 
 // Response to user login
@@ -133,8 +134,72 @@ app.get('/ui', (req, res) => {
 
 });
 
+app.post('/ui', (req, res) => {
+
+    //console.log(req.body);
+
+    try {
+
+        if (req.body.userVal && req.body.group && req.body.members) {
+            
+            //console.log("This is a group submission");
+
+            const {userVal, group, members} = req.body;
+            const db = new DbConnector();
+
+            const gSuccess = db.createGroup(userVal, group);
+
+            gSuccess.then((gResult) => {
+
+                if (gResult == true) {
+                    console.log('Group successfully created!');
+
+                    const mSuccess = db.addMembers(group, members);
+
+                    mSuccess.then((mResult) => {
+
+                        if (mResult == true) {
+                            console.log('Members successfully added!');
+                            res.status(200);
+                            res.send({success: true});  
+                        }
+
+                        else {
+                            console.log('One or more members could not be added.');
+                            res.status(500);
+                            res.send({success: false});
+                        }
+
+                    });
+
+                }
+
+                else {
+                    console.log('Group creation failed!');
+                    res.status(500);
+                    res.send({success: false});
+                }
+
+            });
+
+        }
+
+        else {
+            res.status(400);
+            throw new Error('Request not recognized');
+        }
+
+    }
+
+    catch(error) {
+        console.log(error.message);
+    }
+
+});
+
 app.get('/chat', (req, res) => {
 
+    res.status(200);
     res.render('chat.ejs');
 
 })
