@@ -28,6 +28,12 @@
                         <% }); %>
                     <%}%>
                 </ul>
+                <h5>Pending requests...</h5>
+                <ul>
+                    <li>000000 friend</li>
+                    <button>accept</button>
+                    <button>decline</button>
+                </ul>
             </div>
             <!--Button to call friend request form-->
             <button id="friendReqButton">Send Friend Request</button>
@@ -50,30 +56,46 @@
             <button id="createGroupButton">Create Group</button>
         </div>
         
+        <!-- Form for making a friend request -->
         <form method="POST" id="friendForm" style="display: none;">
             <label for="friendId">Enter your friend's id here:</label>
-            <input type="text" id="friendId"></form>
+            <input type="text" id="friendId">
             <input type="submit" id="friendIdButton" style="display:none;"> 
         </form>
 
+        <!-- Form for creating a group -->
         <form method="POST" id="groupForm" style="display: none;">
             <label for="groupName">Enter your group's name here:</label>
-            <input type="text" id="groupName"></form>
+            <input type="text" id="groupName">
+            <label for="groupMembers">What members will be in your group?</label>
+            <input type="text" id="groupMembers">
             <input type="submit" id="groupNameButton" style="display:none"> 
         </form>
     </div>
 
     <script>
 
-        const userGreeting = document.getElementById('userGreeting');
-
+        // Retrieve friend request and group creation buttons
         const friendReqButton = document.getElementById('friendReqButton');
         const createGroupButton = document.getElementById('createGroupButton');
 
+        // Retrieve group name and friend id submission buttons
         const groupNameButton = document.getElementById('groupNameButton');
         const friendIdButton = document.getElementById('friendIdButton');
+
+        // Retrieve friend and group forms
         const friendForm = document.getElementById('friendForm');
         const groupForm = document.getElementById('groupForm');
+
+        // Retrieve friend id data
+        const friendId = document.getElementById('friendId');
+
+        // Retrieve group name and group member data
+        const groupName = document.getElementById('groupName');
+        const groupMembers = document.getElementById('groupMembers');
+
+        // Retrieve the current user's id
+        let userVal = '<%-userVal%>';
 
         // Event listener for the createGroupButton
         createGroupButton.addEventListener('click', (event) => {
@@ -94,6 +116,44 @@
                 groupForm.style.display = 'none';
                 groupNameButton.style.display = 'none';
             }
+        });
+
+        // Event listener for group submission form
+        groupNameButton.addEventListener('click', (event) => {
+
+            event.preventDefault();
+
+            // Separate values of provided string by commas
+            const members = groupMembers.value.split(',');
+
+            // Loop through members array to trim whitespace
+            for (i = 0; i < members.length; i++) {
+                members[i] = members[i].trim();
+            } 
+
+            const data = {userVal: userVal, group: groupName.value, members: members};
+
+            fetch('http://localhost:3000/ui', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // Convert the object data to a string format
+                body: JSON.stringify(data)
+            });
+
+            groupName.value = '';
+            groupMembers.value = '';
+
+        });
+
+        // Event listener for friend submission form
+        friendIdButton.addEventListener('click', (event) => {
+
+            event.preventDefault();
+            console.log(friendId.value);
+            friendId.value = '';
+
         });
 
         // Event listener for the friendReqButton
