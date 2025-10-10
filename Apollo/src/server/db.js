@@ -324,6 +324,8 @@ class DbConnector {
         }
         
         catch(error) {
+
+            // If error occurred with data retrieval, print to the console
             console.log(error);
         }
     }
@@ -335,7 +337,7 @@ class DbConnector {
             const id = await new Promise((resolve, reject) => {
                 
                 // Creates query for database connection
-                const query = 'SELECT User_id FROM user_data WHERE username = ?';
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
 
                 // Processes query through database, replacing the ? with the userVal provided
                 dbCon.query(query, [userVal], (error, result) => {
@@ -372,8 +374,253 @@ class DbConnector {
         }
         
         catch(error) {
+
+            // If error occurred with data retrieval, print to the console
             console.log(error);
         }
+    }
+
+    async getFriendReqs(userVal) {
+        // Attempt to retrieve a user id for a given username
+        const id = await new Promise((resolve, reject) => {
+                
+            // Creates query for database connection
+            const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+            // Processes query through database, replacing the ? with the userVal provided
+            dbCon.query(query, [userVal], (error, result) => {
+                if (error) { 
+                    reject(new Error(error.message));
+                }
+                else {
+                    resolve(result);
+                } 
+            });
+        });
+
+        // Assign the user id retrieved from the database to a constant
+        const userId = id[0].User_id.toString();
+
+        // Attempt to retrieve group data for a user id
+        const reqList = await new Promise((resolve, reject) => {
+                
+            // Creates query for database connection
+            const query = 'SELECT User_id, Username FROM user_data WHERE User_id in (SELECT Requester_id FROM user_data, requests WHERE User_id = ? AND User_id = Recipient_id)';
+
+            // Processes query through database, replacing the ? with the userVal provided
+            dbCon.query(query, [userId], (error, result) => {
+                if (error) { 
+                    reject(new Error(error.message));
+                }
+                else {
+                    resolve(result);
+                } 
+            });
+        });
+
+        return reqList;
+    }
+
+    async friendReq(userVal, friendId) {
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            // Attempt to insert a friend request entry in database
+            let response = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO requests VALUES (?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [userId, friendId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // If friend request succeeded, return true
+            return true;
+
+        }
+
+        catch (error){
+
+            // If error occurred with friend request, print it to console and return false
+            console.log(error);
+            return false;
+        }
+    }
+
+    async acceptFriend(userVal, friendId) {
+
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            /* NOTE: Friend insertion query must be performed twice because of the nature of a 
+               friend relationship; Ex. user1 is friends with user2 and user2 is friends with user1, 
+               thus a friend relationship is two-way */
+
+            const fResponse1 = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO friends VALUES (?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [userId, friendId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+
+            });
+
+            const fResponse2 = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO friends VALUES (?, ?)';
+
+                // Processes query through database twice, replacing the ? with the values provided
+                dbCon.query(query, [friendId, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+
+            });
+
+
+            // Delete friend request entry from database
+            const rResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'DELETE FROM requests WHERE Requester_id = ? AND Recipient_id = ?';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [friendId, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+
+            });
+
+            // If friend relationship is established successfully and request entry is deleted, return true
+            return true;
+
+        }
+
+        // If error occurred with friend relationship, print it to console and return false
+        catch(error) {
+            console.log(error);
+            return false;
+        }
+ 
+    }
+
+    async rejectFriend(userVal, friendId) {
+
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            // Delete friend request entry from database
+            const rResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'DELETE FROM requests WHERE Requester_id = ? AND Recipient_id = ?';
+
+                // Processes query through database twice, replacing the ? with the values provided
+                dbCon.query(query, [friendId, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+
+            });
+
+            // If friend request is deleted successfully, return true
+            return true;
+
+        }
+
+        // If error occurred with request deletion, print it to console and return false
+        catch(error) {
+            console.log(error);
+            return false;
+        }
+
     }
 }
 
