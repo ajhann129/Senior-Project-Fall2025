@@ -19,7 +19,7 @@ function validateForm() {
     if (email.match(emailReq)) {
         createEmail.style.borderColor = 'green';
 
-        emailWarning = document.getElementById('emailWarning');
+        let emailWarning = document.getElementById('emailWarning');
         if (emailWarning) emailWarning.remove();
 
         validateEmail = true;
@@ -49,7 +49,7 @@ function validateForm() {
     if (username.match(userReq)) {
         createUsername.style.borderColor = 'green';
 
-        userWarning = document.getElementById('userWarning');
+        let userWarning = document.getElementById('userWarning');
         if (userWarning) userWarning.remove();
 
         validateUsername = true;
@@ -90,7 +90,7 @@ function validateForm() {
         createPw.style.borderColor = 'green';
         pwConf.style.borderColor = 'green';
 
-        pwWarning = document.getElementById('pwWarning');
+        let pwWarning = document.getElementById('pwWarning');
         if (pwWarning) pwWarning.remove();
 
         validatePassword = true;
@@ -134,7 +134,7 @@ function validateForm() {
         }
 
         // If a warning is already displayed, remove it
-        pwWarning = document.getElementById('pwWarning');
+        let pwWarning = document.getElementById('pwWarning');
         if (pwWarning) pwWarning.remove();
 
         // Insert new error message
