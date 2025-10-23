@@ -1,9 +1,10 @@
 const express = require('express');
-const app = express();
-//const crypto = require('crypto');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const DbConnector = require('./db');
+
+// Creates a function handler for HTTP requests and assigns it to a constant called app 
+const app = express();
 
 // Loads contents of env file into process.env
 dotenv.config();
@@ -17,7 +18,9 @@ app.use(express.json());
 // Allows server to read form data
 app.use(express.urlencoded({extended: false}));
 
+// Sets directory for dynamic pages
 app.set('views', '../client/views');
+// Sets view engine to EJS
 app.set('view engine', 'ejs');
 
 // Array to store user information
@@ -241,6 +244,7 @@ app.post('/ui', (req, res) => {
 
 });
 
+// Response to accepting/rejecting a friend request
 app.patch('/ui', (req, res) => {
 
     try {
@@ -299,6 +303,7 @@ app.patch('/ui', (req, res) => {
             
         }
 
+        // Otherwise, if the request does not match a recognized form, return a status of 400 (bad request)
         else {
             res.status(400);
             throw new Error('Request not recognized');
@@ -306,18 +311,166 @@ app.patch('/ui', (req, res) => {
 
     }
 
+    // If an error occurs, print it to the console
     catch(error) {
         console.log(error.message);
     }
 
 });
 
+// Displays chat interface page
 app.get('/chat', (req, res) => {
 
-    res.status(200);
-    console.log(users);
-    res.render('chat.ejs');
+    try {
+
+        // If the displayed chat is not a group chat, call the getDirectMsg() function
+        if (req.query.friendName) {
+
+            // Assign values sent in the request body to associated variables
+            const {userVal, friendName} = req.query;
+            const db = new DbConnector();
+
+            // Retrieve direct message data from database 
+            fResult = db.getDirectMsg(userVal, friendName);
+
+            fResult.then((directMsg) => {
+                
+                // Render the chat interface page with the retrieved data (if any)
+                res.status(200);
+                res.render('chat.ejs', {
+                    userVal: userVal,
+                    friendName: friendName,
+                    directMsg: directMsg,
+                    groupChat: false,
+                });
+
+            });
+
+            
+        }
+
+        // If the displayed chat is a group chat, call the getGroupMsg() function
+        else if (req.query.groupName) {
+
+            // Assign values sent in the request body to associated variables
+            const {userVal, groupName} = req.query;
+            const db = new DbConnector();
+
+            // Retrieve group message data from database
+            gResult = db.getGroupMsg(groupName);
+
+            gResult.then((groupMsg) => {
+                
+                // Render the chat interface page with the retrieved data (if any)
+                res.status(200);
+                res.render('chat.ejs', {
+                    userVal: userVal,
+                    groupName: groupName,
+                    groupMsg: groupMsg,
+                    groupChat: true
+                });
+
+            }); 
+
+        }
+
+        // Otherwise, if the request does not match a recognized form, return a status of 400 (bad request)
+        else {
+            res.status(400);
+            throw new Error('Request not recognized');
+        }
+
+    }
+
+    // If an error occurs, print it to the console
+    catch(error) {
+        console.log(error.message);
+    }
 
 });
+
+// Response to a user sending a message
+app.post('/chat', (req, res) => {
+
+    try {
+
+        // If the received message is a direct message, call the sendDirectMsg() function
+        if (req.body.friendName) {
+
+            // Assign values sent in the request body to associated variables
+            const {userVal, friendName, usrMsg, msgDate} = req.body;
+            const db = new DbConnector();
+
+            // Format JavaScript Date object into a string applicable to MySQL
+            formDate = new Date(msgDate.toString()).toISOString().slice(0, 19).replace("T", " ");
+
+            // Create new entries in database for the direct message data
+            const success = db.sendDirectMsg(userVal, friendName, usrMsg, formDate);
+
+            success.then((result) => {
+
+                // If the message was successfully sent, confirm success with a status of 200
+                if (result == true) {
+                    console.log('Message successfully sent!');
+                    res.status(200);
+                    res.send({success: true});
+                }
+
+                // If the message failed to send, return a status of 500 (server-side error)
+                else {
+                    console.log('Message failed to send!');
+                    res.status(500);
+                    res.send({success: false});
+                }
+
+            });
+        }
+
+        // If the received message is for a group chat, call the sendGroupMsg() function
+        else if (req.body.groupName) {
+
+            // Assign values sent in the request body to associated variables
+            const {userVal, groupName, usrMsg, msgDate} = req.body;
+            const db = new DbConnector();
+
+            // Format JavaScript Date object into a string applicable to MySQL
+            formDate = new Date(msgDate.toString()).toISOString().slice(0, 19).replace("T", " ");
+
+            // Create new entries in database for the group message data
+            const success = db.sendGroupMsg(userVal, groupName, usrMsg, formDate);
+
+            success.then((result) => {
+
+                // If the message was successfully sent, confirm success with a status of 200
+                if (result == true) {
+                    console.log('Message successfully sent!');
+                    res.status(200);
+                    res.send({success: true});
+                }
+
+                // If the message failed to send, return a status of 500 (server-side error)
+                else {
+                    console.log('Message failed to send!');
+                    res.status(500);
+                    res.send({success: false});
+                }
+
+            });
+        }
+
+        // Otherwise, if the request does not match a recognized form, return a status of 400 (bad request)
+        else {
+            res.status(400);
+            throw new Error('Request not recognized');
+        }
+
+    }
+
+    // If an error occurs, print it to the console
+    catch(error) {
+        console.log(error.message);
+    }
+
+}); 
 
 app.listen(process.env.PORT, () => console.log('Server connected...'));

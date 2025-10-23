@@ -381,44 +381,54 @@ class DbConnector {
     }
 
     async getFriendReqs(userVal) {
-        // Attempt to retrieve a user id for a given username
-        const id = await new Promise((resolve, reject) => {
-                
-            // Creates query for database connection
-            const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+        try {
 
-            // Processes query through database, replacing the ? with the userVal provided
-            dbCon.query(query, [userVal], (error, result) => {
-                if (error) { 
-                    reject(new Error(error.message));
-                }
-                else {
-                    resolve(result);
-                } 
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
             });
-        });
 
-        // Assign the user id retrieved from the database to a constant
-        const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
 
-        // Attempt to retrieve group data for a user id
-        const reqList = await new Promise((resolve, reject) => {
-                
-            // Creates query for database connection
-            const query = 'SELECT User_id, Username FROM user_data WHERE User_id in (SELECT Requester_id FROM user_data, requests WHERE User_id = ? AND User_id = Recipient_id)';
+            // Attempt to retrieve group data for a user id
+            const reqList = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id, Username FROM user_data WHERE User_id in (SELECT Requester_id FROM user_data, requests WHERE User_id = ? AND User_id = Recipient_id)';
 
-            // Processes query through database, replacing the ? with the userVal provided
-            dbCon.query(query, [userId], (error, result) => {
-                if (error) { 
-                    reject(new Error(error.message));
-                }
-                else {
-                    resolve(result);
-                } 
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
             });
-        });
 
-        return reqList;
+            return reqList;
+
+        }
+
+        catch(error) {
+
+            //If error occurred with data retrieval, print to the console
+            console.log(error);
+        }
     }
 
     async friendReq(userVal, friendId) {
@@ -622,6 +632,347 @@ class DbConnector {
         }
 
     }
+
+    async getDirectMsg(userVal, friendName) {
+
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const id = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = id[0].User_id.toString();
+
+            // Attempt to retrieve a user id for the given friend name
+            const fId = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the friendName provided
+                dbCon.query(query, [friendName], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const friendId = fId[0].User_id.toString();
+
+            // Attempt to retrieve message data for a user id
+            const directMsg = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT Username, Content, Date_sent FROM user_data, receives, message_data WHERE ((Receiver_id = ? AND Sender_id = ?) OR (Sender_id = ? AND Receiver_id = ?)) AND M_id = Message_id AND Sender_id = User_id AND Group_message = 0 ORDER BY Date_sent';
+
+                // Processes query through database, replacing the ? with the userId and friendId provided
+                dbCon.query(query, [userId, friendId, userId, friendId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            return directMsg;
+
+        }
+
+        // If error occurred with data retrieval, print to the console
+        catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    async getGroupMsg(groupName) {
+
+        try {
+
+            // Attempt to retrieve a group id for a given group name
+            const gId = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                const query = 'SELECT Group_id FROM group_data WHERE Group_name = ?';
+
+                // Processes query through database, replacing the ? with the groupName provided
+                dbCon.query(query, [groupName], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the group id retrieved from the database to a constant
+            const groupId = gId[0].Group_id.toString();
+
+            // Attempt to retrieve group message data for the given groupId
+            const groupMsg = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                const query = 'SELECT Username, Content, Date_sent FROM user_data, message_data, group_data WHERE Group_message = 1 AND Group_id = ? AND Chat_id = Group_id AND Sender_id = User_id ORDER BY Date_sent';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [groupId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            return groupMsg;
+
+        }
+
+        // If error occurred with data retrieval, print to the console
+        catch(error) {
+            console.log(error);
+        }
+
+    }
+
+    async sendDirectMsg(userVal, friendName, usrMsg, msgDate) {
+
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const uId = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = uId[0].User_id.toString();
+
+            // Attempt to retrieve a user id for the given friend name
+            const fId = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the friendName provided
+                dbCon.query(query, [friendName], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const friendId = fId[0].User_id.toString();
+
+            // Randomly generate a message id for the new message
+            const msgId = Math.floor(Math.random() * 100000000);
+
+            // Attempt to insert a message entry in database
+            let mResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO message_data VALUES (?, ?, 0, ?, ?, null)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [msgId, usrMsg, msgDate, userId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Attempt to insert a recipient entry in database
+            let rResponse = await new Promise((resolve, reject) => {
+                    
+                // Creates query for database connection
+                let query = 'INSERT INTO receives VALUES (?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [msgId, friendId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // If message is successfully sent, return true
+            return true;
+
+        }
+
+        catch(error) {
+            // If error occurred with sending message, print it to console and return false
+            console.log(error);
+            return false;
+        }
+
+    }
+
+    async sendGroupMsg(userVal, groupName, usrMsg, msgDate) {
+
+        try {
+
+            // Attempt to retrieve a user id for a given username
+            const uId = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                const query = 'SELECT User_id FROM user_data WHERE Username = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [userVal], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the user id retrieved from the database to a constant
+            const userId = uId[0].User_id.toString();
+
+            // Attempt to retrieve a group id for a given group name
+            const gId = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                const query = 'SELECT Group_id FROM group_data WHERE Group_name = ?';
+
+                // Processes query through database, replacing the ? with the groupName provided
+                dbCon.query(query, [groupName], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Assign the group id retrieved from the database to a constant
+            const groupId = gId[0].Group_id.toString();
+
+            // Attempt to retrieve a list of user ids for a given group id
+            const mList = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                const query = 'SELECT Member_id FROM enters WHERE G_id = ?';
+
+                // Processes query through database, replacing the ? with the userVal provided
+                dbCon.query(query, [groupId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Create a new array to store a list of user ids
+            const memberList = [mList.length];
+
+            // Loop through the array of database entries and assign the strings to the memberList array
+            for (let i = 0; i < mList.length; i++) memberList[i] = mList[i].Member_id.toString();
+            
+            // Randomly generate a message id for the new message
+            const msgId = Math.floor(Math.random() * 100000000);
+
+            // Attempt to insert a message entry in database
+            let mResponse = await new Promise((resolve, reject) => {
+                        
+                // Creates query for database connection
+                let query = 'INSERT INTO message_data VALUES (?, ?, 1, ?, ?, ?)';
+
+                // Processes query through database, replacing the ? with the values provided
+                dbCon.query(query, [msgId, usrMsg, msgDate, userId, groupId], (error, result) => {
+                    if (error) { 
+                        reject(new Error(error.message));
+                    }
+                    else {
+                        resolve(result);
+                    } 
+                });
+            });
+
+            // Loop through the list of user ids in the current group and assign each string a database entry
+            for (let j = 0; j < memberList.length; j++) {
+
+                // Attempt to insert a recipient entry in database
+                let rResponse = await new Promise((resolve, reject) => {
+                            
+                    // Creates query for database connection
+                    let query = 'INSERT INTO receives VALUES (?, ?)';
+
+                    // Processes query through database, replacing the ? with the values provided
+                    dbCon.query(query, [msgId, memberList[j]], (error, result) => {
+                        if (error) { 
+                            reject(new Error(error.message));
+                        }
+                        else {
+                            resolve(result);
+                        } 
+                    });
+                });    
+
+            }
+
+            // If message is successfully sent, return true
+            return true;
+
+        }
+
+        catch(error) {
+            // If error occurred with sending message, print it to console and return false
+            console.log(error);
+            return false;
+        }
+
+    }
+
 }
 
 // Exports the class DbConnector to be used in app.js
