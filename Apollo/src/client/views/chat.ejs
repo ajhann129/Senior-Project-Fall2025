@@ -23,7 +23,7 @@
             <h1 id="dmHeader">Chat between <%=userVal%> and <span id="friendName"><%=friendName%></span></h1>
             <% if (directMsg) {%>
                 <%directMsg.forEach(function(message) {%>
-                    <p class="displayedMsg"><span class="msgData"><%=message.Date_sent.toLocaleString()%> <%=message.Username%></span><span class="textContent"><%=message.Content%></span></p>
+                    <p class="displayedMsg"><span class="msgData"><%=message.Date_sent.toLocaleString()%> UTC, <%=message.Username%></span><span class="textContent"><%=message.Content%></span></p>
                 <%});%>
             <%}%>
 
@@ -33,7 +33,7 @@
             <!--forEach loop to display group messages-->
             <% if (groupMsg) {%>
                 <%groupMsg.forEach(function(message) {%>
-                    <p class="displayedMsg"><span class="msgData"><%=message.Date_sent.toLocaleString()%> <%=message.Username%></span><span class="textContent"><%=message.Content%></span></p>
+                    <p class="displayedMsg"><span class="msgData"><%=message.Date_sent.toLocaleString()%> UTC, <%=message.Username%></span><span class="textContent"><%=message.Content%></span></p>
                 <%});%>
             <%}%>
         <%}%>
@@ -54,43 +54,16 @@
 
         const userVal = '<%-userVal%>';
         const groupChat = '<%-groupChat%>';
-        
-        // Function to display a message on the webpage
-        function displayMsg(msgDate, text) {
 
-            // If usrMsg's value is not blank excluding whitespace, then send and display the message
-            if (text.trim() != '') {
+        // Interval to periodically refresh page every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 20000);
 
-                // Create a new p element and assign it a class of displayedMsg
-                message = document.createElement('p');
-                message.setAttribute('class', 'displayedMsg');
-
-                // Create a new span element and assign a string including currDate and userVal to its innerHTML 
-                msgData = document.createElement('span');
-                msgData.innerHTML = msgDate.toLocaleString() + ' ' + userVal;
-
-                // Assign the first span element a class of msgData
-                msgData.setAttribute('class', 'msgData');
-
-                // Create a new span element and assign the value of text to its innerHTML
-                textContent = document.createElement('span');
-                textContent.innerHTML = text;
-
-                // Assign the second span element a class of textContent
-                textContent.setAttribute('class', 'textContent');
-
-                // Append msgData as a child of message
-                message.appendChild(msgData);
-
-                // Add textContent as an additional child within message
-                msgData.after(textContent);
-
-                // Insert the created p element message above the usrMsg input element, then clear usrMsg's value
-                usrMsg.before(message);
-                usrMsg.value = '';
-            }
-
-        }
+        // Event listener to autoscroll page to latest message
+        document.addEventListener('DOMContentLoaded', function() {
+            window.scrollTo(0, document.body.scrollHeight);
+        });
 
         // Event listener for send button
         sendMsg.addEventListener('click', (event) => {
@@ -119,7 +92,7 @@
                         body: JSON.stringify(data)
                     });
 
-                    displayMsg(msgDate, text);
+                    location.reload();
 
                 }
 
@@ -142,7 +115,7 @@
                         body: JSON.stringify(data)
                     });
 
-                    displayMsg(msgDate, text);
+                    location.reload();
 
                 }
 
@@ -177,7 +150,7 @@
                         body: JSON.stringify(data)
                     });
 
-                    displayMsg(msgDate, text);
+                    location.reload();
 
                 }
 
@@ -200,7 +173,7 @@
                         body: JSON.stringify(data)
                     });
 
-                    displayMsg(msgDate, text);
+                    location.reload();
 
                 }
                 
