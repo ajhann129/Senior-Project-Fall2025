@@ -1,0 +1,6 @@
+PORT=3000
+USER=guest
+PASSWORD=password123
+DATABASE=apollo_db
+DB_PORT=3306
+HOST=127.0.0.1 
