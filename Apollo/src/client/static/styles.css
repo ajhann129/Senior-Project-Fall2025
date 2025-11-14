@@ -30,7 +30,7 @@ ul li a {
     background-color: lightgrey;
     border-color: cyan;
 
-    width: 800px;
+    width: 795px;
     height: 50px;
     resize: none;
 }
@@ -40,7 +40,7 @@ ul li a {
     width: 200px;
     height: 30px;
 
-    margin-left: 606px;
+    margin-left: 600px;
 
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 
@@ -58,8 +58,17 @@ p.displayedMsg {
     height: 80px;
     overflow-wrap: anywhere;
 
-    background-color: #7f7a91;
+    background-color: #9e95c0;
     color: black;
+}
+
+/*Styling for message sender and datetime*/
+span.msgData {
+    white-space: nowrap;
+    margin-right: 5px;
+    font-style: italic;
+    color:#1d1b24;
+    background-color: rgb(32, 131, 131);
 }
 
 div.titleHeader {
@@ -110,6 +119,10 @@ div.interface {
 #friendsList h3 {
     justify-self: center;
     text-decoration: underline;
+}
+
+#friendsList h5 {
+    justify-self: center;
 }
 
 #friendsList ul {
@@ -171,26 +184,83 @@ div.interface {
     margin-left: 25px;
 }
 
+/*Warning display for group creation form*/
+#groupForm p {
+    color: red;
+    font-size: small;
+
+    overflow-wrap: normal;
+
+    margin-bottom: 4px;
+}
+
+/*Warning display for friend request form*/
+#friendForm p {
+    color: red;
+    font-size: small;
+
+    overflow-wrap: normal;
+
+    margin-bottom: 7px;
+}
+
 #friendId, #groupName {
     margin-top: 50px;
     width: 130px;
+}
+
+/*Styling for groupMembers input and label*/
+#groupMembers {
+    display: block;
+    margin-left: 258px;
+    margin-top: -18px;
+    width: 130px;
+}
+
+label[for="groupMembers"] {
+    display: block;
+    margin-top: 20px;
+}
+
+/*Styling for friendId input and label*/
+
+#friendId {
+    display: block;
+    margin-left: 195px;
+    margin-top: -16px;
+    width: 130px;
+}
+
+label[for="friendId"] {
+    display: block;
+    margin-top: 50px;
 }
 
 div.interface form label{
     font-size: smaller;
 }
 
-#friendIdButton {
-    margin-left: 395px;
-    margin-top: -21px;
+#friendIdButton, #groupNameButton {
+    width: 100px;
+    height: 25px;
+
+    margin-left: 35%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+    border-radius: 5px;
+    border-style: double;
+    border-color: cyan;
+
+    background-color: grey;
+    color: white;
+
+    position: static;
 }
 
-#groupNameButton {
-    margin-left: 420px;
-    margin-top: -21px;
-}
-
-/*Styling for form submission buttons*/
+/*Styling for signup and login buttons*/
 #createAccButton, #loginButton {
     width: 100px;
     height: 25px;

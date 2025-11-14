@@ -1,5 +1,3 @@
-Create a .env file with the following contents:
-
 PORT=3000
 USER=guest
 PASSWORD=password123

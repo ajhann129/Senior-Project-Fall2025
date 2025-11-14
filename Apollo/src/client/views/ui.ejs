@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apollo Chat</title>
+    <!--Reference to external stylesheet-->
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="Apollo_Favicon.png" type="image/png">
 </head>
 <body>
     <!--Container for application title-->
@@ -24,15 +26,20 @@
                     <!--forEach loop to display friend data-->
                     <%if (fList) {%>
                         <%fList.forEach(function(friend) { %>
-                            <li><a href="/chat"><%= friend.User_id%> <%= friend.Username%></a></li>
+                            <li><a href="/chat" class="friendChat" id="<%=friend.Username%>"><%= friend.User_id%> <%= friend.Username%></a></li>
                         <% }); %>
                     <%}%>
                 </ul>
                 <h5>Pending requests...</h5>
                 <ul>
-                    <li>000000 friend</li>
-                    <button>accept</button>
-                    <button>decline</button>
+                    <!--forEach loop to display friend requests-->
+                    <%if (rList) {%>
+                            <%rList.forEach(function(req) { %>
+                                <li id="<%=req.User_id%>"><%=req.User_id%> <%=req.Username%></li>
+                                <button class="acceptFriend">accept</button>
+                                <button class="declineFriend">decline</button>
+                            <% }); %>
+                    <% } %>
                 </ul>
             </div>
             <!--Button to call friend request form-->
@@ -47,7 +54,7 @@
                     <!--forEach loop to display group data-->
                     <%if (gList) {%>
                         <%gList.forEach(function(group) { %>
-                            <li><a href="/chat"><%= group.Group_id%> <%= group.Group_name%></a></li>
+                            <li><a href="/chat" class="groupChat" id="<%=group.Group_name%>"><%= group.Group_id%> <%= group.Group_name%></a></li>
                         <% }); %>
                     <% } %>
                 </ul>
@@ -94,9 +101,81 @@
         const groupName = document.getElementById('groupName');
         const groupMembers = document.getElementById('groupMembers');
 
+        // Retrieve friend request buttons
+        const accFriendButton = document.getElementsByClassName('acceptFriend');
+        const decFriendButton = document.getElementsByClassName('declineFriend');
+
+        // Retrieve friend and group anchor elements
+        const friendChat = document.getElementsByClassName('friendChat');
+        const groupChat = document.getElementsByClassName('groupChat');
+
         // Retrieve the current user's id
         let userVal = '<%-userVal%>';
 
+        // Event listener for friendChat link
+        for (let i = 0; i < friendChat.length; i++) {
+            // For every anchor element with class friendChat, add an event listener that redirects to a chat with the provided query string
+            friendChat[i].addEventListener('click', (event) => {
+                event.preventDefault();
+                window.location.href = `/chat?userVal=${userVal}&friendName=${friendChat[i].id}`;
+            });
+        }
+
+        // Event listener for groupChat link
+        for (let j = 0; j < groupChat.length; j++) {
+            // For every anchor element with class groupChat, add an event listener that redirects to a chat with the provided query string
+            groupChat[j].addEventListener('click', (event) => {
+                event.preventDefault();
+                window.location.href = `/chat?userVal=${userVal}&groupName=${groupChat[j].id}`;
+            });
+        }
+
+        // Event listener for accFriendButton
+        for (let k = 0; k < accFriendButton.length; k++) {
+
+            // Create a data object with the associated userVal and friendId, as well as a status of accepted
+            let data = {userVal: userVal, friendId: accFriendButton[k].previousElementSibling.id, status: 'accepted'}
+
+            // For every button with the acceptFriend class, add an event listener that makes a patch request to the server
+            accFriendButton[k].addEventListener('click', (event) => {
+
+                fetch('http://localhost:3000/ui', {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    // Convert the object data to a string format
+                    body: JSON.stringify(data)
+                });
+
+                window.location.reload();
+            });
+            
+        }
+
+        // Event listener for decFriendButton
+        for (let l = 0; l < decFriendButton.length; l++) {
+            
+            // Create a data object with the associated userVal and friendId, as well as a status of rejected
+            let data = {userVal: userVal, friendId: decFriendButton[l].previousElementSibling.previousElementSibling.id, status: 'rejected'}
+
+            // For every button with the declineFriend class, add an event listener that makes a patch request to the server
+            decFriendButton[l].addEventListener('click', (event) => {
+
+                fetch('http://localhost:3000/ui', {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    // Convert the object data to a string format
+                    body: JSON.stringify(data)
+                });
+
+                window.location.reload();
+            });
+            
+        }
+        
         // Event listener for the createGroupButton
         createGroupButton.addEventListener('click', (event) => {
             // If the group name form and button are hidden, display them
@@ -123,27 +202,121 @@
 
             event.preventDefault();
 
-            // Separate values of provided string by commas
-            const members = groupMembers.value.split(',');
+            if (groupMembers.value.trim() != '' && groupName.value.trim() != '') {
 
-            // Loop through members array to trim whitespace
-            for (i = 0; i < members.length; i++) {
-                members[i] = members[i].trim();
-            } 
+                nameWarning = document.getElementById('nameWarning');
+                memberWarning = document.getElementById('memberWarning');
+                groupFailWarning = document.getElementById('groupFailWarning');
 
-            const data = {userVal: userVal, group: groupName.value, members: members};
+                if (nameWarning) nameWarning.remove();
 
-            fetch('http://localhost:3000/ui', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                // Convert the object data to a string format
-                body: JSON.stringify(data)
-            });
+                if (memberWarning) memberWarning.remove();
 
-            groupName.value = '';
-            groupMembers.value = '';
+                if (groupFailWarning) groupFailWarning.remove();
+
+                groupMembers.style.borderColor = 'cyan';
+                groupName.style.borderColor = 'cyan';
+
+                // Separate values of provided string by commas
+                const members = groupMembers.value.split(',');
+
+                // Loop through members array to trim whitespace
+                for (i = 0; i < members.length; i++) {
+                    members[i] = members[i].trim();
+                } 
+
+                const data = {userVal: userVal, group: groupName.value, members: members};
+
+                fetch('http://localhost:3000/ui', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    // Convert the object data to a string format
+                    body: JSON.stringify(data)
+                }).then((response) => { 
+                    response.json();
+
+                    if (response.ok) {
+                        groupName.value = '';
+                        groupMembers.value = '';
+                        window.location.reload();
+                    }
+
+                    else {
+
+                        if (response.status == 500) {
+
+                            groupMembers.style.borderColor = 'red';
+                            groupName.style.borderColor = 'red';
+
+                            let warning = document.createElement('p');
+                            warning.id = 'groupFailWarning';
+                            warning.innerHTML = '*An error has occurred with the server! Your formatting may be incorrect. (Note: All group members must be separated by commas.)';
+                            groupMembers.after(warning);
+
+                        }
+                        
+                    }
+
+                });
+
+            }
+
+            else if (groupName.value == '') {
+
+                nameWarning = document.getElementById('nameWarning');
+                memberWarning = document.getElementById('memberWarning');
+                groupFailWarning = document.getElementById('groupFailWarning');
+
+                if (nameWarning) nameWarning.remove();
+
+                if (memberWarning) memberWarning.remove();
+
+                if (groupFailWarning) groupFailWarning.remove();
+
+                groupMembers.style.borderColor = 'cyan';
+                groupName.style.borderColor = 'red';
+
+                let warning = document.createElement('p');
+                warning.id = 'nameWarning';
+                warning.innerHTML = '*Please type a name for the created group';
+                groupName.after(warning);
+
+                if (groupMembers.value == '') {
+
+                    groupMembers.style.borderColor = 'red';
+
+                    let warning = document.createElement('p');
+                    warning.id = 'memberWarning';
+                    warning.innerHTML = '*Please specify members to add to the group';
+                    groupMembers.after(warning);
+
+                }
+
+            }
+
+            else if (groupMembers.value == '') {
+
+                nameWarning = document.getElementById('nameWarning');
+                memberWarning = document.getElementById('memberWarning');
+                groupFailWarning = document.getElementById('groupFailWarning');
+
+                if (nameWarning) nameWarning.remove();
+
+                if (memberWarning) memberWarning.remove();
+
+                if (groupFailWarning) groupFailWarning.remove();
+
+                groupName.style.borderColor = 'cyan';
+                groupMembers.style.borderColor = 'red';
+
+                let warning = document.createElement('p');
+                warning.id = 'memberWarning';
+                warning.innerHTML = '*Please specify members to add to the group';
+                groupMembers.after(warning);
+
+            }
 
         });
 
@@ -151,8 +324,72 @@
         friendIdButton.addEventListener('click', (event) => {
 
             event.preventDefault();
-            console.log(friendId.value);
-            friendId.value = '';
+
+            console.log(userVal);
+
+            if (friendId.value.trim() != '') {
+
+                idWarning = document.getElementById('idWarning');
+                friendFailWarning = document.getElementById('friendFailWarning');
+
+                if (idWarning) idWarning.remove();
+
+                if (friendFailWarning) friendFailWarning.remove();
+
+                friendId.style.borderColor = 'cyan';
+
+                const data = {userVal: userVal, friendId: friendId.value};
+
+                fetch('http://localhost:3000/ui', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    // Convert the object data to a string format
+                    body: JSON.stringify(data)
+                }).then((response) => { 
+                    response.json();
+
+                    if (response.ok) {
+                        friendId.value = '';
+                    } 
+
+                    else {
+
+                        if (response.status == 500) {
+
+                            friendId.style.borderColor = 'red';
+
+                            let warning = document.createElement('p');
+                            warning.id = 'friendFailWarning';
+                            warning.innerHTML = '*An error has occurred with the server! (Friend request failed to send!)';
+                            friendId.after(warning);
+
+                        }
+                        
+                    }
+
+
+                });
+
+                
+
+            }
+
+            else {
+
+                idWarning = document.getElementById('idWarning');
+
+                if (idWarning) idWarning.remove();
+
+                friendId.style.borderColor = 'red';
+
+                let warning = document.createElement('p');
+                warning.id = 'idWarning';
+                warning.innerHTML = '*Please input a valid six-digit user id number.';
+                friendId.after(warning);
+
+            }
 
         });
 
