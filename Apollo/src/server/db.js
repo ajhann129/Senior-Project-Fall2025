@@ -144,8 +144,8 @@ class DbConnector {
             // Generate a random id number for the provided group name
             const groupId = Math.floor(Math.random() * 1000000);
 
-            // Assign the retrieved user id to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the retrieved user id to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to insert a new group into database
             const gResponse = await new Promise((resolve, reject) => {
@@ -220,8 +220,8 @@ class DbConnector {
                     });
                 });
 
-                // Assign data retrieved to index i of the memberId array
-                memberId[i] = mId[0].User_id.toString();
+                // Assign data retrieved to index i of the memberId array, padding with zeroes if necessary
+                memberId[i] = mId[0].User_id.toString().padStart(6, '0');
             }
 
             // Attempt to retrieve a corresponding id for the provided groupName
@@ -241,8 +241,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the retrieved group id to a constant
-            const gId = groupId[0].Group_id.toString();
+            // Assign the retrieved group id to a constant, padding with leading zeros if necessary
+            const gId = groupId[0].Group_id.toString().padStart(6, '0');        
             
             // Loop through the database a second time to assign members to the group
             for (let i = 0; i < memberId.length; i++) {
@@ -300,8 +300,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve friend data for a user id
             const friendList = await new Promise((resolve, reject) => {
@@ -319,6 +319,11 @@ class DbConnector {
                     } 
                 });
             });
+
+            // Loops through retrieved array to pad each user id
+            for (let i = 0; i < friendList.length; i++) {
+                friendList[i].User_id = friendList[i].User_id.toString().padStart(6, '0');
+            }
 
             return friendList;
         }
@@ -350,8 +355,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve group data for a user id
             const groupList = await new Promise((resolve, reject) => {
@@ -369,6 +374,11 @@ class DbConnector {
                     } 
                 });
             });
+
+            // Loops through retrieved array to pad each group id
+            for (let i = 0; i < groupList.length; i++) {
+                groupList[i].Group_id = groupList[i].Group_id.toString().padStart(6, '0');
+            }
 
             return groupList;
         }
@@ -400,8 +410,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve group data for a user id
             const reqList = await new Promise((resolve, reject) => {
@@ -419,6 +429,11 @@ class DbConnector {
                     } 
                 });
             });
+
+            // Loops through retrieved array to pad each user id
+            for (let i = 0; i < reqList.length; i++) {
+                reqList[i].User_id = reqList[i].User_id.toString().padStart(6, '0');
+            }
 
             return reqList;
 
@@ -452,7 +467,10 @@ class DbConnector {
             });
 
             // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            const userId = id[0].User_id.toString().padStart(6, '0');      
+
+            // Pads friend id with leading zeros if necessary
+            friendId = friendId.padStart(6, '0');
 
             // If the user attempts to friend themselves, throw an error
             if (userId == friendId) throw new Error("User cannot friend themselves!");
@@ -508,8 +526,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             /* NOTE: Friend insertion query must be performed twice because of the nature of a 
                friend relationship; Ex. user1 is friends with user2 and user2 is friends with user1, 
@@ -602,8 +620,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Delete friend request entry from database
             const rResponse = await new Promise((resolve, reject) => {
@@ -657,8 +675,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = id[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = id[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve a user id for the given friend name
             const fId = await new Promise((resolve, reject) => {
@@ -677,8 +695,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const friendId = fId[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const friendId = fId[0].User_id.toString().padStart(6, '0');        
 
             // Attempt to retrieve message data for a user id
             const directMsg = await new Promise((resolve, reject) => {
@@ -729,8 +747,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the group id retrieved from the database to a constant
-            const groupId = gId[0].Group_id.toString();
+            // Assign the group id retrieved from the database to a constant, padding with leading zeros if necessary
+            const groupId = gId[0].Group_id.toString().padStart(6, '0'); 
 
             // Attempt to retrieve group message data for the given groupId
             const groupMsg = await new Promise((resolve, reject) => {
@@ -781,8 +799,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = uId[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = uId[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve a user id for the given friend name
             const fId = await new Promise((resolve, reject) => {
@@ -801,8 +819,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const friendId = fId[0].User_id.toString();
+            // Assign the friend id retrieved from the database to a constant, padding with leading zeros if necessary
+            const friendId = fId[0].User_id.toString().padStart(6, '0');
 
             // Randomly generate a message id for the new message
             const msgId = Math.floor(Math.random() * 100000000);
@@ -875,8 +893,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the user id retrieved from the database to a constant
-            const userId = uId[0].User_id.toString();
+            // Assign the user id retrieved from the database to a constant, padding with leading zeros if necessary
+            const userId = uId[0].User_id.toString().padStart(6, '0');            
 
             // Attempt to retrieve a group id for a given group name
             const gId = await new Promise((resolve, reject) => {
@@ -895,8 +913,8 @@ class DbConnector {
                 });
             });
 
-            // Assign the group id retrieved from the database to a constant
-            const groupId = gId[0].Group_id.toString();
+            // Assign the group id retrieved from the database to a constant, padding with leading zeros if necessary
+            const groupId = gId[0].Group_id.toString().padStart(6, '0');        
 
             // Attempt to retrieve a list of user ids for a given group id
             const mList = await new Promise((resolve, reject) => {
